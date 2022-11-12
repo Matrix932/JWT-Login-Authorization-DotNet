@@ -1,3 +1,5 @@
+using JWT_Login_Authorization_DotNet.Interfaces;
+using JWT_Login_Authorization_DotNet.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -35,6 +37,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = false,
     };
 });
+//DI
+builder.Services.AddScoped<ICandidateTableStorageService, CandidateStorageService>();
 
 var app = builder.Build();
 
