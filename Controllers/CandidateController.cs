@@ -1,12 +1,13 @@
 ﻿using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWT_Login_Authorization_DotNet.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class CandidateController : ControllerBase
     {
         private readonly ICandidateTableStorageService _candidateService;
@@ -17,33 +18,45 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet]
-        [ActionName(nameof(GetAsync))]
+        [ActionName("GetCandidate")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
             {
-                return NotFound("Name or id cannot be empty ");
+                return BadRequest("Name or id cannot be empty ");
             }
             return Ok(await _candidateService.GetCandidateAsync(id, name));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] CandidateDTO candidate)
+        [HttpGet, AllowAnonymous]
+        public async Task<IActionResult> GetAllCandidates()
         {
-            Candidate azureCandidate = new Candidate();
-            azureCandidate.Name = candidate.Name;
-            azureCandidate.Id = candidate.Id;
-            azureCandidate.Surname = candidate.Surname;
-            azureCandidate.Seniority = candidate.Seniority;
-            azureCandidate.RowKey = candidate.Name;
-            azureCandidate.Timestamp = DateTime.UtcNow;
-            azureCandidate.ETag = Azure.ETag.All;
-            azureCandidate.PartitionKey = candidate.Id;
+            return Ok(await _candidateService.GetAllCandidatesAsync());
+        }
+
+        [HttpPost, AllowAnonymous]
+        public async Task<IActionResult> PostAsync([FromQuery] CandidateDTO candidate)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            Candidate azureCandidate = _candidateService.MapCandidate(candidate).Result;
+
             await _candidateService.UpsertCandidateAsync(azureCandidate);
             return Ok("You have sucessully created candidate: " + azureCandidate.Name + " " + azureCandidate.Surname);
+        }
 
-            //var createdEntity = await _storageService.UpsertEntityAsync(entity);
-            //return CreatedAtAction(nameof(GetAsync), createdEntity);
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest("Name or id cannot be empty ");
+            }
+            await _candidateService.DeleteCandidateAsync(id, name);
+            return Ok("You have sucessufully deleted : " + id + " " + name + " from storage");
         }
     }
 }

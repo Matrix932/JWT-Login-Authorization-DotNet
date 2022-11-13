@@ -22,6 +22,18 @@ namespace JWT_Login_Authorization_DotNet.Services
             return tableClient;
         }
 
+        public async Task<List<CandidateDTO>> GetAllCandidatesAsync()
+        {
+            var tableClient = await GetTableClient();
+            List<Candidate> candidates = tableClient.Query<Candidate>().ToList();
+            List<CandidateDTO> dtoCandidates = new List<CandidateDTO>();
+            foreach (Candidate candidate in candidates)
+            {
+                dtoCandidates.Add(MapCandidateDTO(candidate).Result);
+            }
+            return dtoCandidates;
+        }
+
         public async Task<Candidate> GetCandidateAsync(string id, string name)
         {
             var tableClient = await GetTableClient();
@@ -39,6 +51,32 @@ namespace JWT_Login_Authorization_DotNet.Services
             var tableClient = await GetTableClient();
             await tableClient.UpsertEntityAsync(candidate);
             return candidate;
+        }
+
+        public async Task<Candidate> MapCandidate(CandidateDTO candidateDTO)
+        {
+            Candidate candidate = new Candidate();
+            candidate.Name = candidateDTO.Name;
+            candidate.Id = candidateDTO.Id;
+            candidate.Surname = candidateDTO.Surname;
+            candidate.Seniority = candidateDTO.Seniority;
+            candidate.RowKey = candidateDTO.Name;
+            candidate.Timestamp = DateTime.UtcNow;
+            candidate.ETag = Azure.ETag.All;
+            candidate.PartitionKey = candidateDTO.Id;
+
+            return candidate;
+        }
+
+        public async Task<CandidateDTO> MapCandidateDTO(Candidate candidate)
+        {
+            CandidateDTO candidateDto = new CandidateDTO();
+            candidateDto.Name = candidate.Name;
+            candidateDto.Surname = candidate.Surname;
+            candidateDto.Id = candidate.Id;
+            candidateDto.Seniority = candidate.Seniority;
+
+            return candidateDto;
         }
     }
 }

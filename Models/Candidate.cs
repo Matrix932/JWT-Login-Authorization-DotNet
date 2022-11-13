@@ -13,6 +13,7 @@ namespace JWT_Login_Authorization_DotNet.Models
         public string Surname { get; set; }
 
         public string Seniority { get; set; }
+
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
