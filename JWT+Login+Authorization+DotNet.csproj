@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.7.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.25.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
