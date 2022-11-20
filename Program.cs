@@ -16,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 //
 builder.Services.AddSwaggerGen(options =>
 {
+    options.EnableAnnotations();//Added for readonly and write only annotations
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Authorization token using the bearer scheme(\"bearer {token}\")",
@@ -39,6 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 //DI
 builder.Services.AddScoped<ICandidateTableStorageService, CandidateStorageService>();
+builder.Services.AddScoped<ITaskTableStorageService, TaskStorageService>();
 
 var app = builder.Build();
 
