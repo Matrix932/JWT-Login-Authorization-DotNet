@@ -3,18 +3,11 @@ using Azure.Data.Tables;
 
 namespace JWT_Login_Authorization_DotNet.Models
 {
-    public class Candidate : ITableEntity
+    public class Skill : ITableEntity
     {
-        // the partition key can partition our data into groups and the
-        // row key can identify an entity uniquely within a partition.
-        // Mapping is done trough DTO objects so most of the validation is performed there.
         public string Id { get; set; }
-
         public string Name { get; set; }
-        public string Surname { get; set; }
-
-        public string Seniority { get; set; }
-
+        public string? Tasks { get; set; }
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }

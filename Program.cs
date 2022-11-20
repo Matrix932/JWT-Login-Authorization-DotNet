@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 //DI
 builder.Services.AddScoped<ICandidateTableStorageService, CandidateStorageService>();
 builder.Services.AddScoped<ITaskTableStorageService, TaskStorageService>();
+builder.Services.AddScoped<ISkillTableStoragerService, SkillStorageService>();
 
 var app = builder.Build();
 
