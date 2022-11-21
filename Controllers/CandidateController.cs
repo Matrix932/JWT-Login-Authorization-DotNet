@@ -1,4 +1,5 @@
-﻿using JWT_Login_Authorization_DotNet.Interfaces;
+﻿using Azure;
+using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,16 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             {
                 return BadRequest("Name or id cannot be empty ");
             }
-            return Ok(await _candidateService.GetCandidateAsync(id, name));
+
+            try
+            {
+                Candidate candidate = await _candidateService.GetCandidateAsync(id, name);
+                return Ok(candidate);
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
         }
 
         [HttpGet, AllowAnonymous]
@@ -38,25 +48,68 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         [HttpPost, AllowAnonymous]
         public async Task<IActionResult> PostAsync([FromQuery] CandidateDTO candidate)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
-            Candidate azureCandidate = _candidateService.MapCandidate(candidate).Result;
+                Candidate azureCandidate = await _candidateService.MapCandidate(candidate);
 
-            await _candidateService.UpsertCandidateAsync(azureCandidate);
-            return Ok("You have sucessully created candidate: " + azureCandidate.Name + " " + azureCandidate.Surname);
+                Response response = await _candidateService.CreateCanidateAsync(azureCandidate);
+
+                if (response.Status == 409 || response.Status == 400)
+                {
+                    return StatusCode(response.Status, "Failed to create cadidate");
+                }
+                return Ok("You have sucessully created candidate: " + azureCandidate.Name + " " + azureCandidate.Surname);
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
         }
 
-        [HttpDelete]
+        [HttpDelete, AllowAnonymous]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest("Name or id cannot be empty ");
             }
-            await _candidateService.DeleteCandidateAsync(id, name);
-            return Ok("You have sucessufully deleted : " + id + " " + name + " from storage");
+            try
+            {
+                //Overiding Azure default behavior where 404's are swallowed when executing delete methods
+                Response response = await _candidateService.DeleteCandidateAsync(id, name);
+                if (response.Status == 404)
+                {
+                    return NotFound("The provided candidate does not exist in the database");
+                }
+                return Ok("You have sucessufully deleted : " + id + " " + name + " from storage");
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
+        }
+
+        [HttpPut, AllowAnonymous]
+        public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                Candidate azureCandidate = await _candidateService.MapCandidate(candidateDTO);
+                Response response = await _candidateService.UpdateCandidateAsync(azureCandidate);
+                if (response.IsError)
+                {
+                    return StatusCode(response.Status, "Failed to update Candidate");
+                }
+                return Ok("You have sucessufully updated canidate :" + azureCandidate.Name + " ID :  " + azureCandidate.Id);
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
         }
     }
 }

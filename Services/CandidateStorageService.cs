@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Task = System.Threading.Tasks.Task;
@@ -10,6 +11,7 @@ namespace JWT_Login_Authorization_DotNet.Services
         private const string TableName = "Candidate";
         private readonly IConfiguration _configuration;
 
+        //DI
         public CandidateStorageService(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -41,17 +43,10 @@ namespace JWT_Login_Authorization_DotNet.Services
             return await tableClient.GetEntityAsync<Candidate>(id, name);
         }
 
-        public async Task DeleteCandidateAsync(string id, string name)
+        public async Task<Response> DeleteCandidateAsync(string id, string name)
         {
             var tableClient = await GetTableClient();
-            await tableClient.DeleteEntityAsync(id, name);
-        }
-
-        public async Task<Candidate> UpsertCandidateAsync(Candidate candidate)
-        {
-            var tableClient = await GetTableClient();
-            await tableClient.UpsertEntityAsync(candidate);
-            return candidate;
+            return await tableClient.DeleteEntityAsync(id, name);
         }
 
         public async Task<Candidate> MapCandidate(CandidateDTO candidateDTO)
@@ -78,6 +73,20 @@ namespace JWT_Login_Authorization_DotNet.Services
             candidateDto.Seniority = candidate.Seniority;
 
             return candidateDto;
+        }
+
+        public async Task<Response> CreateCanidateAsync(Candidate candidate)
+        {
+            var tableClient = await GetTableClient();
+            Response response = await tableClient.AddEntityAsync<Models.Candidate>(candidate);
+            return response;
+        }
+
+        public async Task<Response> UpdateCandidateAsync(Candidate candidate)
+        {
+            var tableClient = await GetTableClient();
+            Response reseponse = await tableClient.UpdateEntityAsync<Models.Candidate>(candidate, Azure.ETag.All);
+            return reseponse;
         }
     }
 }

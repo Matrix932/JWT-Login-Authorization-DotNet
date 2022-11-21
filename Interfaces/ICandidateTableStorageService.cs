@@ -1,4 +1,5 @@
-﻿using JWT_Login_Authorization_DotNet.Models;
+﻿using Azure;
+using JWT_Login_Authorization_DotNet.Models;
 using Task = System.Threading.Tasks.Task;
 
 namespace JWT_Login_Authorization_DotNet.Interfaces
@@ -9,12 +10,14 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
 
         Task<List<CandidateDTO>> GetAllCandidatesAsync();
 
-        Task DeleteCandidateAsync(string id, string name);
-
-        Task<Candidate> UpsertCandidateAsync(Candidate candidate);
+        Task<Response> DeleteCandidateAsync(string id, string name);
 
         Task<Candidate> MapCandidate(CandidateDTO candidateDTO);
 
         Task<CandidateDTO> MapCandidateDTO(Candidate candidate);
+
+        Task<Response> CreateCanidateAsync(Candidate candidate);
+
+        Task<Response> UpdateCandidateAsync(Candidate candidate);
     }
 }
