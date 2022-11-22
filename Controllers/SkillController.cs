@@ -1,7 +1,9 @@
-﻿using JWT_Login_Authorization_DotNet.Interfaces;
+﻿using Azure;
+using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace JWT_Login_Authorization_DotNet.Controllers
 {
@@ -10,10 +12,12 @@ namespace JWT_Login_Authorization_DotNet.Controllers
     public class SkillController : ControllerBase
     {
         private readonly ISkillTableStoragerService _skillService;
+        private readonly ITaskTableStorageService _taskTableStorageService;
 
-        public SkillController(ISkillTableStoragerService skillService)
+        public SkillController(ISkillTableStoragerService skillService, ITaskTableStorageService taskTableStorageService)
         {
             _skillService = skillService;
+            _taskTableStorageService = taskTableStorageService;
         }
 
         [HttpGet("GetSkill{SkillId}/{SkillName}")]
@@ -52,8 +56,20 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             {
                 return BadRequest("Name or id cannot be empty ");
             }
-            await _skillService.DeleteSkillAsync(SkillId, SkillName);
-            return Ok("You have sucessufully deleted : " + SkillName + " " + SkillId + " from storage");
+            try
+            {
+                await _skillService.DeleteSkillAsync(SkillId, SkillName);
+                List<Models.Task> tasks = await _taskTableStorageService.GetTasksBySkillName(SkillName);
+                foreach (Models.Task task in tasks)
+                {
+                    await _taskTableStorageService.DeleteTaskAsync(task.Id, SkillName);
+                }
+                return Ok("You have sucessufully deleted : " + SkillName + " " + SkillId + " from storage");
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
         }
     }
 }

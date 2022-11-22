@@ -2,6 +2,7 @@
 using Azure.Data.Tables;
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
+using System.Linq;
 
 namespace JWT_Login_Authorization_DotNet.Services
 {
@@ -59,8 +60,7 @@ namespace JWT_Login_Authorization_DotNet.Services
         public async Task<List<Models.Task>> GetAllTaskAsync()
         {
             var tableClient = await GetTableClient();
-
-            return tableClient.Query<Models.Task>().ToList();
+            return await tableClient.QueryAsync<Models.Task>().ToListAsync();
         }
 
         public async System.Threading.Tasks.Task<Response> DeleteTaskAsync(string id, string skillName)
@@ -79,6 +79,23 @@ namespace JWT_Login_Authorization_DotNet.Services
         {
             var tableClient = await GetTableClient();
             await tableClient.UpdateEntityAsync<Models.Task>(task, Azure.ETag.All);
+        }
+
+        public async Task<List<Models.Task>> GetTasksBySkillName(string skillName)
+        {
+            var tableClient = await GetTableClient();
+
+            return await tableClient.QueryAsync<Models.Task>(x => x.RowKey.Equals(skillName)).ToListAsync();
+        }
+
+        public async System.Threading.Tasks.Task DeleteTasksBySkill(string skillName)
+        {
+            var tableClient = await GetTableClient();
+            List<Models.Task> tasks = await GetTasksBySkillName(skillName);
+            foreach (Models.Task task in tasks)
+            {
+                await DeleteTaskAsync(task.PartitionKey, task.RowKey);
+            }
         }
     }
 }

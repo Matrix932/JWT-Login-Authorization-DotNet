@@ -12,10 +12,12 @@ namespace JWT_Login_Authorization_DotNet.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskTableStorageService _taskService;
+        private readonly ISkillTableStoragerService _skillService;
 
-        public TaskController(ITaskTableStorageService taskTableStorageService)
+        public TaskController(ITaskTableStorageService taskTableStorageService, ISkillTableStoragerService skillService)
         {
             _taskService = taskTableStorageService;
+            _skillService = skillService;
         }
 
         [HttpGet("GetTask")]
@@ -44,6 +46,24 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             try
             {
                 return Ok(await _taskService.GetAllTaskAsync());
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
+        }
+
+        [HttpGet("GetTasksBySkill")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
+        {
+            if (string.IsNullOrWhiteSpace(skillName))
+            {
+                return BadRequest("Skill name cannot be empty");
+            }
+            try
+            {
+                return Ok(_taskService.GetTasksBySkillName(skillName).Result);
             }
             catch (RequestFailedException ex)
             {

@@ -20,5 +20,9 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
         System.Threading.Tasks.Task<Models.Task> MapTask(TaskDTO taskDTO);
 
         System.Threading.Tasks.Task<TaskDTO> MapTaskDTO(Models.Task task);
+
+        Task<List<Models.Task>> GetTasksBySkillName(string skillName);
+
+        System.Threading.Tasks.Task DeleteTasksBySkill(string skillName);
     }
 }
