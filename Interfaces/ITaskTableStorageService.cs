@@ -1,4 +1,5 @@
-﻿using JWT_Login_Authorization_DotNet.Models;
+﻿using Azure;
+using JWT_Login_Authorization_DotNet.Models;
 
 namespace JWT_Login_Authorization_DotNet.Interfaces
 {
@@ -8,11 +9,11 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
         //
         Task<Models.Task> GetTaskAsync(string id, string skillName);
 
-        Task<List<TaskDTO>> GetAllTaskAsync();
+        Task<List<Models.Task>> GetAllTaskAsync();
 
-        System.Threading.Tasks.Task DeleteTaskAsync(string id, string skillName);
+        System.Threading.Tasks.Task<Response> DeleteTaskAsync(string id, string skillName);
 
-        System.Threading.Tasks.Task CreateTaskAsync(Models.Task task);
+        System.Threading.Tasks.Task<Response> CreateTaskAsync(Models.Task task);
 
         System.Threading.Tasks.Task UpdateTaskAsync(Models.Task task);
 

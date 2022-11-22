@@ -54,7 +54,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
                 Response response = await _candidateService.CreateCanidateAsync(azureCandidate);
 
-                if (response.Status == 409 || response.Status == 400)
+                if (response.IsError)
                 {
                     return StatusCode(response.Status, "Failed to create cadidate");
                 }
@@ -94,7 +94,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Ivalid Model State");
             }
             try
             {

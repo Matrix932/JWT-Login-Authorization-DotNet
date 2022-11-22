@@ -1,4 +1,5 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 
@@ -55,28 +56,23 @@ namespace JWT_Login_Authorization_DotNet.Services
             return taskDTO;
         }
 
-        public async Task<List<TaskDTO>> GetAllTaskAsync()
+        public async Task<List<Models.Task>> GetAllTaskAsync()
         {
             var tableClient = await GetTableClient();
-            List<Models.Task> tasks = tableClient.Query<Models.Task>().ToList();
-            List<TaskDTO> taskDTOs = new List<TaskDTO>();
-            foreach (var task in tasks)
-            {
-                taskDTOs.Add(MapTaskDTO(task).Result);
-            }
-            return taskDTOs;
+
+            return tableClient.Query<Models.Task>().ToList();
         }
 
-        public async System.Threading.Tasks.Task DeleteTaskAsync(string id, string skillName)
+        public async System.Threading.Tasks.Task<Response> DeleteTaskAsync(string id, string skillName)
         {
             var tableClient = await GetTableClient();
-            await tableClient.DeleteEntityAsync(id, skillName);
+            return await tableClient.DeleteEntityAsync(id, skillName);
         }
 
-        public async System.Threading.Tasks.Task CreateTaskAsync(Models.Task task)
+        public async System.Threading.Tasks.Task<Response> CreateTaskAsync(Models.Task task)
         {
             var tableClient = await GetTableClient();
-            await tableClient.AddEntityAsync<Models.Task>(task);
+            return await tableClient.AddEntityAsync<Models.Task>(task);
         }
 
         public async System.Threading.Tasks.Task UpdateTaskAsync(Models.Task task)
