@@ -1,6 +1,7 @@
 ﻿using Azure.Data.Tables;
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
+using System.Linq;
 
 namespace JWT_Login_Authorization_DotNet.Services
 {
@@ -37,8 +38,7 @@ namespace JWT_Login_Authorization_DotNet.Services
         public async Task<List<Skill>> GetAllSkillsAsync()
         {
             var tableClient = await GetTableClient();
-            List<Models.Skill> skills = tableClient.Query<Models.Skill>().ToList();
-            return skills;
+            return await tableClient.QueryAsync<Models.Skill>().ToListAsync();
         }
 
         public async Task<Skill> GetSkillAsync(string id, string name)
@@ -66,9 +66,31 @@ namespace JWT_Login_Authorization_DotNet.Services
             return skillDTO;
         }
 
-        public Task<Skill> UpdateSkillAsync(Skill skill)
+        public async System.Threading.Tasks.Task UpdateSkillAsync(Skill skill)
         {
-            throw new NotImplementedException();
+            var tableClient = await GetTableClient();
+            await tableClient.UpdateEntityAsync<Models.Skill>(skill, Azure.ETag.All);
+        }
+
+        public async Task<Skill> GetSkillByName(string skillName)
+        {
+            var tableClient = await GetTableClient();
+            Skill skill = await tableClient.QueryAsync<Skill>(x => x.RowKey.Equals(skillName)).SingleAsync();
+            return skill;
+        }
+
+        public async Task<bool> CheckIfSkillExistsAsync(string skillName)
+        {
+            var tableClient = await GetTableClient();
+            int count = await tableClient.QueryAsync<Skill>(x => x.RowKey.Equals(skillName)).CountAsync();
+            if (count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

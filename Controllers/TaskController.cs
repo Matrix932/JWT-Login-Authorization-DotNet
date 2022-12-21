@@ -4,6 +4,8 @@ using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Text.Json;
 
 namespace JWT_Login_Authorization_DotNet.Controllers
 {
@@ -78,15 +80,20 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             {
                 return BadRequest("Invalid model state");
             }
+
             try
             {
                 Models.Task azureTask = await _taskService.MapTask(taskDTO);
-
-                Response response = await _taskService.CreateTaskAsync(azureTask);
-                if (response.IsError)
+                if (await _skillService.CheckIfSkillExistsAsync(taskDTO.SkillName) == false)
                 {
-                    return StatusCode(response.Status, "Failed to create candidate");
+                    return StatusCode(400, "Cannot create atask as the following skill has not been created");
                 }
+                Response response = await _taskService.CreateTaskAsync(azureTask);
+
+                Skill skill = await _skillService.GetSkillByName(taskDTO.SkillName);
+                skill.Tasks += JsonSerializer.Serialize(taskDTO);
+                await _skillService.UpdateSkillAsync(skill);
+
                 return Ok("You have sucessully created a task: " + azureTask.Title + " for the following skill " + azureTask.RowKey);
             }
             catch (RequestFailedException ex)

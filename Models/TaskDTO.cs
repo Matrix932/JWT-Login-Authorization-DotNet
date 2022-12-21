@@ -18,6 +18,11 @@ namespace JWT_Login_Authorization_DotNet.Models
 
         [Required]
         [RegularExpression("Not assigned|.Net|Java|Python|Typescript|Java script|React|Angular|QA", ErrorMessage = "Skill cannot be set to this value")]
-        public string? SkillName { get; set; }
+        public string SkillName { get; set; }
+
+        public override string ToString()
+        {
+            return "{ Task Title: " + Title + " Task Level : " + Level + " Task Description : " + Description + " Code : " + Code + " }\n\r";
+        }
     }
 }

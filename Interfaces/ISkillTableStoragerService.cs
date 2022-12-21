@@ -12,10 +12,14 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
 
         System.Threading.Tasks.Task CreateSkillAsync(Skill skill);
 
-        Task<Skill> UpdateSkillAsync(Skill skill);
+        System.Threading.Tasks.Task UpdateSkillAsync(Skill skill);
 
         Task<Skill> MapSkill(SkillDTO skillDTO);
 
         Task<SkillDTO> MapSkillDTO(Skill skill);
+
+        Task<Skill> GetSkillByName(string skillName);
+
+        Task<bool> CheckIfSkillExistsAsync(string skillName);
     }
 }

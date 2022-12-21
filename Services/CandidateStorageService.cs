@@ -3,6 +3,7 @@ using Azure.Data.Tables;
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Task = System.Threading.Tasks.Task;
+using System.Linq;
 
 namespace JWT_Login_Authorization_DotNet.Services
 {
@@ -28,7 +29,7 @@ namespace JWT_Login_Authorization_DotNet.Services
         public async Task<List<CandidateDTO>> GetAllCandidatesAsync()
         {
             var tableClient = await GetTableClient();
-            List<Candidate> candidates = tableClient.Query<Candidate>().ToList();
+            List<Candidate> candidates = await tableClient.QueryAsync<Candidate>().ToListAsync();
             List<CandidateDTO> dtoCandidates = new List<CandidateDTO>();
             foreach (Candidate candidate in candidates)
             {
