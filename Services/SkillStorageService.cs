@@ -83,14 +83,7 @@ namespace JWT_Login_Authorization_DotNet.Services
         {
             var tableClient = await GetTableClient();
             int count = await tableClient.QueryAsync<Skill>(x => x.RowKey.Equals(skillName)).CountAsync();
-            if (count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return count > 0 ? true : false;
         }
     }
 }

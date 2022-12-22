@@ -91,7 +91,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
                 Response response = await _taskService.CreateTaskAsync(azureTask);
 
                 Skill skill = await _skillService.GetSkillByName(taskDTO.SkillName);
-                skill.Tasks += JsonSerializer.Serialize(taskDTO);
+                skill.Tasks += Newtonsoft.Json.JsonConvert.SerializeObject(taskDTO);
                 await _skillService.UpdateSkillAsync(skill);
 
                 return Ok("You have sucessully created a task: " + azureTask.Title + " for the following skill " + azureTask.RowKey);
@@ -111,11 +111,36 @@ namespace JWT_Login_Authorization_DotNet.Controllers
                 {
                     return BadRequest("Name or id cannot be empty ");
                 }
+
+                Models.Task task = await _taskService.GetTaskAsync(id, skillName);
+                TaskDTO taskDTO = await _taskService.MapTaskDTO(task);
                 Response response = await _taskService.DeleteTaskAsync(id, skillName);
                 if (response.IsError)
                 {
                     return StatusCode(response.Status, "Failed to delete task");
                 }
+                try
+                {
+                    Skill skill = await _skillService.GetSkillByName(skillName);
+
+                    if (!String.IsNullOrEmpty(skill.Tasks))
+                    {
+                        var taskString = JsonSerializer.Serialize(taskDTO);
+
+                        var s1 = skill.Tasks.Replace(taskString, null).Trim();
+                        skill.Tasks = s1;
+                        await _skillService.UpdateSkillAsync(skill);
+                    }
+                    else
+                    {
+                        return Ok("Task was not part of any skill but it was deleted from storatge ");
+                    }
+                }
+                catch (RequestFailedException azureEx)
+                {
+                    return StatusCode(azureEx.Status, azureEx.Message);
+                }
+
                 return Ok("You have sucessufully deleted the task from storage");
             }
             catch (RequestFailedException azureEx)

@@ -21,6 +21,7 @@ namespace JWT_Login_Authorization_DotNet.Services
             var serviceClient = new TableServiceClient(_configuration["StorageConnectionString"]);
             var tableClient = serviceClient.GetTableClient(TableName);
             await tableClient.CreateIfNotExistsAsync();
+            
             return tableClient;
         }
 
