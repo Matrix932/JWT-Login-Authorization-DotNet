@@ -66,6 +66,29 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
+        [HttpPut, AllowAnonymous]
+        public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Ivalid Model State");
+            }
+            try
+            {
+                Candidate azureCandidate = await _candidateService.MapCandidate(candidateDTO);
+                Response response = await _candidateService.UpdateCandidateAsync(azureCandidate);
+                if (response.IsError)
+                {
+                    return StatusCode(response.Status, "Failed to update Candidate");
+                }
+                return Ok("You have sucessufully updated canidate :" + azureCandidate.Name + " ID :  " + azureCandidate.Id);
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
+        }
+
         [HttpDelete, AllowAnonymous]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
         {
@@ -89,22 +112,14 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut, AllowAnonymous]
-        public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
+        [HttpDelete, AllowAnonymous]
+        [ActionName("DeleteAllCandidates")]
+        public async Task<IActionResult> DeleteAllCandidatesAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Ivalid Model State");
-            }
             try
             {
-                Candidate azureCandidate = await _candidateService.MapCandidate(candidateDTO);
-                Response response = await _candidateService.UpdateCandidateAsync(azureCandidate);
-                if (response.IsError)
-                {
-                    return StatusCode(response.Status, "Failed to update Candidate");
-                }
-                return Ok("You have sucessufully updated canidate :" + azureCandidate.Name + " ID :  " + azureCandidate.Id);
+                await _candidateService.DeleteAllCandidatesAsync();
+                return Ok("You have sucessufully deleted all candidates from storage ");
             }
             catch (RequestFailedException azureEx)
             {

@@ -89,5 +89,16 @@ namespace JWT_Login_Authorization_DotNet.Services
             Response reseponse = await tableClient.UpdateEntityAsync<Models.Candidate>(candidate, Azure.ETag.All);
             return reseponse;
         }
+
+        public async Task DeleteAllCandidatesAsync()
+        {
+            //Found that this is better practice then droping whole table as droping may colide with insert opearations
+            var tableClient = await GetTableClient();
+            List<Candidate> candidates = await tableClient.QueryAsync<Candidate>().ToListAsync();
+            foreach (Candidate candidate in candidates)
+            {
+                await tableClient.DeleteEntityAsync(candidate.Id, candidate.Name);
+            }
+        }
     }
 }

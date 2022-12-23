@@ -19,5 +19,7 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
         Task<Response> CreateCanidateAsync(Candidate candidate);
 
         Task<Response> UpdateCandidateAsync(Candidate candidate);
+
+        System.Threading.Tasks.Task DeleteAllCandidatesAsync();
     }
 }

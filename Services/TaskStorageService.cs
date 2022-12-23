@@ -21,7 +21,7 @@ namespace JWT_Login_Authorization_DotNet.Services
             var serviceClient = new TableServiceClient(_configuration["StorageConnectionString"]);
             var tableClient = serviceClient.GetTableClient(TableName);
             await tableClient.CreateIfNotExistsAsync();
-            
+
             return tableClient;
         }
 
@@ -96,6 +96,16 @@ namespace JWT_Login_Authorization_DotNet.Services
             foreach (Models.Task task in tasks)
             {
                 await DeleteTaskAsync(task.PartitionKey, task.RowKey);
+            }
+        }
+
+        public async System.Threading.Tasks.Task DeleteAllTasksAsync()
+        {
+            var tableClient = await GetTableClient();
+            List<Models.Task> tasks = await tableClient.QueryAsync<Models.Task>().ToListAsync();
+            foreach (Models.Task task in tasks)
+            {
+                await tableClient.DeleteEntityAsync(task.PartitionKey, task.RowKey);
             }
         }
     }

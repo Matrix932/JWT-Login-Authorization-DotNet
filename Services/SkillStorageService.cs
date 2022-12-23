@@ -85,5 +85,16 @@ namespace JWT_Login_Authorization_DotNet.Services
             int count = await tableClient.QueryAsync<Skill>(x => x.RowKey.Equals(skillName)).CountAsync();
             return count > 0 ? true : false;
         }
+
+        public async System.Threading.Tasks.Task DeleteAllsSkillsAsync()
+        {
+            //Found that this is better practice then droping whole table as droping may colide with insert opearations
+            var tableClient = await GetTableClient();
+            List<Skill> skills = await tableClient.QueryAsync<Skill>().ToListAsync();
+            foreach (Skill skill in skills)
+            {
+                await tableClient.DeleteEntityAsync(skill.PartitionKey, skill.RowKey);
+            }
+        }
     }
 }

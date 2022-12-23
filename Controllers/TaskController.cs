@@ -24,6 +24,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTask")]
         [AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string skillName)
         {
             if (string.IsNullOrWhiteSpace(skillName) || string.IsNullOrWhiteSpace(id))
@@ -65,7 +66,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
             try
             {
-                return Ok(_taskService.GetTasksBySkillName(skillName).Result);
+                return Ok(await _taskService.GetTasksBySkillName(skillName));
             }
             catch (RequestFailedException ex)
             {

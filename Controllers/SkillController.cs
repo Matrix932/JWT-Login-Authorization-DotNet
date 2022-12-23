@@ -13,15 +13,15 @@ namespace JWT_Login_Authorization_DotNet.Controllers
     public class SkillController : ControllerBase
     {
         private readonly ISkillTableStoragerService _skillService;
-        private readonly ITaskTableStorageService _taskTableStorageService;
+        private readonly ITaskTableStorageService _taskService;
 
         public SkillController(ISkillTableStoragerService skillService, ITaskTableStorageService taskTableStorageService)
         {
             _skillService = skillService;
-            _taskTableStorageService = taskTableStorageService;
+            _taskService = taskTableStorageService;
         }
 
-        [HttpGet("GetSkill{SkillId}/{SkillName}")]
+        [HttpGet("GetSkill")]
         public async Task<IActionResult> GetAsync(string SkillId, string SkillName)
         {
             if (string.IsNullOrWhiteSpace(SkillName) || string.IsNullOrWhiteSpace(SkillId))
@@ -29,6 +29,12 @@ namespace JWT_Login_Authorization_DotNet.Controllers
                 return BadRequest("Name or id cannot be empty ");
             }
             return Ok(await _skillService.GetSkillAsync(SkillId, SkillName));
+        }
+
+        [HttpGet("GetSkills")]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            return Ok(await _skillService.GetAllSkillsAsync());
         }
 
         [HttpPost]
@@ -55,13 +61,27 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("Skills")]
-        public async Task<IActionResult> GetAllAsync()
+        [HttpPut("UpdateSkill"), AllowAnonymous]
+        public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)
         {
-            return Ok(await _skillService.GetAllSkillsAsync());
+            if (string.IsNullOrWhiteSpace(skillId))
+            {
+                return BadRequest("SkillID cannot be empty");
+            }
+
+            try
+            {
+                List<Models.Task> tasks = await _taskService.GetTasksBySkillName(skillDTO.Name);
+                return Ok(tasks);
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
         }
 
         [HttpDelete("DeleteSkill")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes a Skill Entity and all asociates tasks with the skill")]
         public async Task<IActionResult> DeleteAsync(string SkillId, string SkillName)
         {
             if (string.IsNullOrWhiteSpace(SkillName) || string.IsNullOrWhiteSpace(SkillId))
@@ -71,12 +91,12 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             try
             {
                 await _skillService.DeleteSkillAsync(SkillId, SkillName);
-                List<Models.Task> tasks = await _taskTableStorageService.GetTasksBySkillName(SkillName);
+                List<Models.Task> tasks = await _taskService.GetTasksBySkillName(SkillName);
                 if (tasks.Count > 0)
                 {
                     foreach (Models.Task task in tasks)
                     {
-                        await _taskTableStorageService.DeleteTaskAsync(task.Id, SkillName);
+                        await _taskService.DeleteTaskAsync(task.Id, SkillName);
                     }
                 }
                 return Ok("You have sucessufully deleted : " + SkillName + " " + SkillId + " from storage");
@@ -87,22 +107,20 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateTask"), AllowAnonymous]
-        public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)
+        [HttpDelete("DeleteAllSkills")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes all skills and all task entities from storage",
+        "To keep the integrity of storage all task entites must be Deleted ")]
+        public async Task<IActionResult> DeleteSkillsAsync()
         {
-            if (string.IsNullOrWhiteSpace(skillId))
-            {
-                return BadRequest("SkillID cannot be empty");
-            }
-
             try
             {
-                List<Models.Task> tasks = await _taskTableStorageService.GetTasksBySkillName(skillDTO.Name);
-                return Ok(tasks);
+                await _skillService.DeleteAllsSkillsAsync();
+                await _taskService.DeleteAllTasksAsync();
+                return Ok("You have successfully deleted all skills from storage");
             }
-            catch (RequestFailedException azureEx)
+            catch (RequestFailedException ex)
             {
-                return StatusCode(azureEx.Status, azureEx.Message);
+                return StatusCode(ex.Status, ex.Message);
             }
         }
     }

@@ -10,6 +10,8 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
 
         System.Threading.Tasks.Task DeleteSkillAsync(string id, string name);
 
+        System.Threading.Tasks.Task DeleteAllsSkillsAsync();
+
         System.Threading.Tasks.Task CreateSkillAsync(Skill skill);
 
         System.Threading.Tasks.Task UpdateSkillAsync(Skill skill);
