@@ -42,6 +42,24 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
+        [HttpGet("GetTasklById")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a task entity using its id ")]
+        public async Task<IActionResult> GetByIdAsync(string taskId)
+        {
+            if (string.IsNullOrWhiteSpace(taskId))
+            {
+                return BadRequest("Id cannot be empty ");
+            }
+            try
+            {
+                return Ok(await _taskService.GetTaskById(taskId));
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
+        }
+
         [HttpGet("GetTasks")]
         [AllowAnonymous]
         [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all Task entities from storage")]

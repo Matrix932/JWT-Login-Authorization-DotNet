@@ -18,9 +18,9 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _candidateService = candidateService;
         }
 
-        [HttpGet]
-        [ActionName("GetCandidate")]
+        [HttpGet("GetCandidate")]
         [AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a candidate entity using their id and name")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
@@ -40,12 +40,14 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet, AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all candidate entities")]
         public async Task<IActionResult> GetAllCandidates()
         {
             return Ok(await _candidateService.GetAllCandidatesAsync());
         }
 
-        [HttpPost, AllowAnonymous]
+        [HttpPost("CreateCandidate"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Create a new candidate entity")]
         public async Task<IActionResult> PostAsync([FromQuery] CandidateDTO candidate)
         {
             try
@@ -66,7 +68,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut, AllowAnonymous]
+        [HttpPut("UpdateCandidate"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Update a candidate entity", "As the id and name are partion and row keys,they cannot be updated")]
         public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
         {
             if (!ModelState.IsValid)
@@ -89,7 +92,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete, AllowAnonymous]
+        [HttpDelete("DeleteCandidate"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes a candidate entity")]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
@@ -112,8 +116,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete, AllowAnonymous]
-        [ActionName("DeleteAllCandidates")]
+        [HttpDelete("DeleteAllCandidates"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes all candidate entities")]
         public async Task<IActionResult> DeleteAllCandidatesAsync()
         {
             try

@@ -23,22 +23,57 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetSkill")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a skill entity using its id and skillName")]
         public async Task<IActionResult> GetAsync(string SkillId, string SkillName)
         {
             if (string.IsNullOrWhiteSpace(SkillName) || string.IsNullOrWhiteSpace(SkillId))
             {
                 return BadRequest("Name or id cannot be empty ");
             }
-            return Ok(await _skillService.GetSkillAsync(SkillId, SkillName));
+            try
+            {
+                return Ok(await _skillService.GetSkillAsync(SkillId, SkillName));
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
+        }
+
+        [HttpGet("GetSkillById")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a skill entity using its id")]
+        public async Task<IActionResult> GetByIdAsync(string SkillId)
+        {
+            if (string.IsNullOrWhiteSpace(SkillId))
+            {
+                return BadRequest("Id cannot be empty ");
+            }
+            try
+            {
+                return Ok(await _skillService.GetSkillById(SkillId));
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
         }
 
         [HttpGet("GetSkills")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all skill Entities")]
         public async Task<IActionResult> GetAllAsync()
         {
-            return Ok(await _skillService.GetAllSkillsAsync());
+            try
+            {
+                return Ok(await _skillService.GetAllSkillsAsync());
+            }
+            catch (RequestFailedException ex)
+            {
+                return StatusCode(ex.Status, ex.Message);
+            }
         }
 
-        [HttpPost]
+        [HttpPost("CreateSkill")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Create a Skill entity")]
         public async Task<IActionResult> PostAsync([FromQuery] SkillDTO skillDTO)
         {
             try
@@ -63,7 +98,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPut("UpdateSkill"), AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill","" +
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill", "" +
             "Input the skillId of the skill you want to update, you can only update the skill name")]
         public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)
         {
@@ -78,13 +113,21 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
             try
             {
+                //As one of the update parameters is the row key of the entity ,update logic is based on deleting the old entity using inputed ID
+                //and creating a new one in the database
+
+                //Retrieves  a skill entity(already existing/beforeupdate from the database )
                 Skill beforeUpdateSkill = await _skillService.GetSkillById(skillId);
                 Skill afterUpdateSkill = await _skillService.UpdateSkillMapper(skillId, skillDTO);
 
                 List<Models.Task> tasksToDelete = await _taskService.GetTasksBySkillName(beforeUpdateSkill.Name);
                 List<Models.Task> tasksToUpdate = await _taskService.GetTasksBySkillName(beforeUpdateSkill.Name);
+
+                //Deletes the old skill from the database
                 await _skillService.DeleteSkillAsync(beforeUpdateSkill.Id, beforeUpdateSkill.Name);
 
+                //As one of the update paramaters(skillName) is the RowKey of the Task entity
+                //task with the  old skill name must be deleted and task's with the new skill name must be created
                 foreach (Models.Task task in tasksToDelete)
                 {
                     await _taskService.DeleteTaskAsync(task.Id, task.RowKey);
@@ -94,6 +137,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
                     task.RowKey = skillDTO.Name;
                     await _taskService.CreateTaskAsync(task);
                 }
+
+                //Mapping task with the updatedSkillName to DTO's and SerilizingThem to the new(updatedSKill)
                 List<TaskDTO> afterUpdateDTO = new List<TaskDTO>();
                 foreach (var task in tasksToUpdate)
                 {
@@ -101,7 +146,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
                 }
                 afterUpdateSkill.Tasks = JsonSerializer.Serialize<List<TaskDTO>>(afterUpdateDTO);
                 await _skillService.CreateSkillAsync(afterUpdateSkill);
-                return Ok("Lets see if this worked");
+                return Ok("Sucessfully updated the skill");
+                //Mapping task with the updatedSkillName to DTO's and SerilizingThem to the new(updatedSKill)
             }
             catch (RequestFailedException azureEx)
             {

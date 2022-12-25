@@ -20,7 +20,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserDTO request)
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Register a new user")]
+        public async Task<ActionResult<User>> Register([FromQuery] UserDTO request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
@@ -31,7 +32,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("login")]//Login Logic and token creation
-        public async Task<ActionResult<string>> Login(UserDTO request)
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Login and get bearer token used in authorization")]
+        public async Task<ActionResult<string>> Login([FromQuery] UserDTO request)
         {
             if (user.Username != request.Username)
             {
