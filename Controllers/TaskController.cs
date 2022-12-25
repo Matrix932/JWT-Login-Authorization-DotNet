@@ -44,6 +44,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTasks")]
         [AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all Task entities from storage")]
         public async Task<IActionResult> GetTasksAsync()
         {
             try
@@ -58,6 +59,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTasksBySkill")]
         [AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
         public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
         {
             if (string.IsNullOrWhiteSpace(skillName))
@@ -74,7 +76,9 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPost, AllowAnonymous]
+        [HttpPost("CreateTask"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Create a task entity",
+            "You cannot create a task for a Skill that doesnt exist in the database, task will automatically be added to corresponding skill after creation")]
         public async Task<IActionResult> PostAsync([FromQuery] TaskDTO taskDTO)
         {
             if (!ModelState.IsValid)
@@ -103,7 +107,67 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpPut("UpdateTask"), AllowAnonymous]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Update a Task entity",
+            "Input the ID of the Task that you want to update, all other inputs are new update values." +
+            "You cannot update the Task's skill name to a skill that doesnt exist in the database")]
+        public async Task<IActionResult> UpdateAsync(string taskId, [FromQuery] TaskDTO taskDTO)
+        {
+            if (string.IsNullOrWhiteSpace(taskId))
+            {
+                return BadRequest("Task ID cannot be empty");
+            }
+            if (await _skillService.CheckIfSkillExistsAsync(taskDTO.SkillName) != true)
+            {
+                return BadRequest("Cannot update Task skill name to : " + taskDTO.SkillName + " because that skill hasnt been created yet, please create the skill entity first");
+            }
+            try
+            {
+                //As one of the update parameters is the row key of the entity ,update logic is based on deleting the old entity using inputed ID
+                //and creating a new one in the database
+                Models.Task taskBeforeUpdate = await _taskService.GetTaskById(taskId);
+                await _taskService.DeleteTaskAsync(taskBeforeUpdate.Id, taskBeforeUpdate.RowKey);
+
+                Models.Task azureTask = await _taskService.MapTask(taskDTO);
+                azureTask.PartitionKey = taskId;
+                azureTask.Id = taskId;
+                await _taskService.CreateTaskAsync(azureTask);
+                //
+                try
+                {
+                    //Removing  the deletedTask(beforeUpdate) from its coresponding
+                    TaskDTO deletedTaskDTO = await _taskService.MapTaskDTO(taskBeforeUpdate);
+
+                    Skill oldTaskSkill = await _skillService.GetSkillByName(taskBeforeUpdate.RowKey);
+                    string deletedTaskSerilized = JsonSerializer.Serialize<TaskDTO>(deletedTaskDTO);
+
+                    //Doesnt work in single line of code(skillBeforeUpdate.Tasks..Replace(deletedTaskSerilized, null).Trim();
+                    var replaceHelper = oldTaskSkill.Tasks.Replace(deletedTaskSerilized, null).Trim();
+                    oldTaskSkill.Tasks = replaceHelper;
+                    await _skillService.UpdateSkillAsync(oldTaskSkill);
+                    //Removing  the deletedTask(beforeUpdate) from its coresponding
+
+                    //Adding the updated(newTask) to its corresponding skill
+                    Skill newTaskSkill = await _skillService.GetSkillByName(taskDTO.SkillName);
+                    string afterUpdateSeriliazed = JsonSerializer.Serialize<TaskDTO>(taskDTO);
+                    newTaskSkill.Tasks += afterUpdateSeriliazed;
+                    await _skillService.UpdateSkillAsync(newTaskSkill);
+                    //Adding the updated(newTask) to its corresponding skill
+                }
+                catch (RequestFailedException azureEx)
+                {
+                    return StatusCode(azureEx.Status, "Error from updates" + azureEx.Message);
+                }
+                return Ok("You have sucessuflly updated the task");
+            }
+            catch (RequestFailedException azureEx)
+            {
+                return StatusCode(azureEx.Status, azureEx.Message);
+            }
+        }
+
+        [HttpDelete("DeleteTask")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Delete a Task entity and remove it from its coresponding skill")]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string skillName)
         {
             try
@@ -150,21 +214,23 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateTask"), AllowAnonymous]
-        public async Task<IActionResult> UpdateAsync(string taskId, [FromQuery] TaskDTO taskDTO)
+        [HttpDelete("DeleteAllTasks")]
+        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes all task entities from storage",
+        "Also removes Task entites from their coresponding skill")]
+        public async Task<IActionResult> DeleteAllTasksAsync()
         {
-            if (string.IsNullOrWhiteSpace(taskId))
-            {
-                return BadRequest("Task ID cannot be empty");
-            }
-
             try
             {
-                Models.Task azureTask = await _taskService.MapTask(taskDTO);
-                azureTask.PartitionKey = taskId;
-                azureTask.Id = taskId;
-                await _taskService.UpdateTaskAsync(azureTask);
-                return Ok("You have sucessuflly updated the task");
+                await _taskService.DeleteAllTasksAsync();
+                try
+                {
+                    await _skillService.DeleteAllTasksFromSkills();
+                }
+                catch (RequestFailedException azureEx)
+                {
+                    return StatusCode(azureEx.Status, azureEx.Message);
+                }
+                return Ok("You have sucessfully deleted all tasks");
             }
             catch (RequestFailedException azureEx)
             {

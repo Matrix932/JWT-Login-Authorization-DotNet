@@ -26,5 +26,7 @@ namespace JWT_Login_Authorization_DotNet.Interfaces
         System.Threading.Tasks.Task DeleteTasksBySkill(string skillName);
 
         System.Threading.Tasks.Task DeleteAllTasksAsync();
+
+        System.Threading.Tasks.Task<Models.Task> GetTaskById(string id);
     }
 }

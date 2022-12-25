@@ -96,5 +96,36 @@ namespace JWT_Login_Authorization_DotNet.Services
                 await tableClient.DeleteEntityAsync(skill.PartitionKey, skill.RowKey);
             }
         }
+
+        public async System.Threading.Tasks.Task DeleteAllTasksFromSkills()
+        {
+            var tableClient = await GetTableClient();
+            List<Skill> skills = await tableClient.QueryAsync<Skill>().ToListAsync();
+            foreach (Skill skill in skills)
+            {
+                skill.Tasks = String.Empty;
+
+                await tableClient.UpdateEntityAsync<Skill>(skill, Azure.ETag.All);
+            }
+        }
+
+        public async Task<Skill> GetSkillById(string id)
+        {
+            var tableClient = await GetTableClient();
+            Skill skill = await tableClient.QueryAsync<Skill>(x => x.PartitionKey.Equals(id)).SingleAsync();
+            return skill;
+        }
+
+        public async Task<Skill> UpdateSkillMapper(string id, SkillDTO skillDTO)
+        {
+            Skill skill = new Skill();
+            skill.Id = id;
+            skill.PartitionKey = id;
+            skill.Name = skillDTO.Name;
+            skill.RowKey = skill.Name;
+            skill.Timestamp = DateTime.Now;
+            skill.ETag = Azure.ETag.All;
+            return skill;
+        }
     }
 }

@@ -108,5 +108,12 @@ namespace JWT_Login_Authorization_DotNet.Services
                 await tableClient.DeleteEntityAsync(task.PartitionKey, task.RowKey);
             }
         }
+
+        public async Task<Models.Task> GetTaskById(string id)
+        {
+            var tableClient = await GetTableClient();
+            Models.Task task = await tableClient.QueryAsync<Models.Task>(x => x.PartitionKey.Equals(id)).SingleAsync();
+            return task;
+        }
     }
 }
