@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'akvelonAtestacija'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_37D19C9D3F674B43B02983805681BBF7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7550935DBE634C4A832C7E0321CF5F52 }}
           package: .
