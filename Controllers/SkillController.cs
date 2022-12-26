@@ -2,15 +2,15 @@
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Text.Json;
 
 namespace JWT_Login_Authorization_DotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SkillController : ControllerBase
     {
         private readonly ISkillTableStoragerService _skillService;
@@ -23,7 +23,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetSkill")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a skill entity using its id and skillName")]
+        [SwaggerOperation("Retrieve a skill entity using its id and skillName")]
         public async Task<IActionResult> GetAsync(string SkillId, string SkillName)
         {
             if (string.IsNullOrWhiteSpace(SkillName) || string.IsNullOrWhiteSpace(SkillId))
@@ -41,7 +41,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetSkillById")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a skill entity using its id")]
+        [SwaggerOperation("Retrieve a skill entity using its id")]
         public async Task<IActionResult> GetByIdAsync(string SkillId)
         {
             if (string.IsNullOrWhiteSpace(SkillId))
@@ -59,7 +59,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetSkills")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all skill Entities")]
+        [SwaggerOperation("Retrieve all skill Entities")]
         public async Task<IActionResult> GetAllAsync()
         {
             try
@@ -73,7 +73,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("CreateSkill")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Create a Skill entity")]
+        [SwaggerOperation("Create a Skill entity")]
         public async Task<IActionResult> PostAsync([FromQuery] SkillDTO skillDTO)
         {
             try
@@ -98,7 +98,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPut("UpdateSkill"), AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill", "" +
+        [SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill", "" +
             "Input the skillId of the skill you want to update, you can only update the skill name")]
         public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)
         {
@@ -156,7 +156,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpDelete("DeleteSkill")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes a Skill Entity and all asociates tasks with the skill")]
+        [SwaggerOperation("Deletes a Skill Entity and all asociates tasks with the skill")]
         public async Task<IActionResult> DeleteAsync(string SkillId, string SkillName)
         {
             if (string.IsNullOrWhiteSpace(SkillName) || string.IsNullOrWhiteSpace(SkillId))
@@ -183,7 +183,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpDelete("DeleteAllSkills")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes all skills and all task entities from storage",
+        [SwaggerOperation("Deletes all skills and all task entities from storage",
         "To keep the integrity of storage all task entites must be Deleted ")]
         public async Task<IActionResult> DeleteSkillsAsync()
         {

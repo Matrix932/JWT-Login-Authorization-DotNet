@@ -2,15 +2,15 @@
 using JWT_Login_Authorization_DotNet.Interfaces;
 using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Text.Json;
 
 namespace JWT_Login_Authorization_DotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TaskController : ControllerBase
     {
         private readonly ITaskTableStorageService _taskService;
@@ -24,7 +24,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTask")]
         [AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
+        [SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string skillName)
         {
             if (string.IsNullOrWhiteSpace(skillName) || string.IsNullOrWhiteSpace(id))
@@ -43,7 +43,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetTasklById")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve a task entity using its id ")]
+        [SwaggerOperation("Retrieve a task entity using its id ")]
         public async Task<IActionResult> GetByIdAsync(string taskId)
         {
             if (string.IsNullOrWhiteSpace(taskId))
@@ -62,7 +62,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTasks")]
         [AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all Task entities from storage")]
+        [SwaggerOperation("Retrieve all Task entities from storage")]
         public async Task<IActionResult> GetTasksAsync()
         {
             try
@@ -95,7 +95,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("CreateTask"), AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Create a task entity",
+        [SwaggerOperation("Create a task entity",
             "You cannot create a task for a Skill that doesnt exist in the database, task will automatically be added to corresponding skill after creation")]
         public async Task<IActionResult> PostAsync([FromQuery] TaskDTO taskDTO)
         {
@@ -126,7 +126,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPut("UpdateTask"), AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Update a Task entity",
+        [SwaggerOperation("Update a Task entity",
             "Input the ID of the Task that you want to update, all other inputs are new update values." +
             "You cannot update the Task's skill name to a skill that doesnt exist in the database")]
         public async Task<IActionResult> UpdateAsync(string taskId, [FromQuery] TaskDTO taskDTO)
@@ -185,7 +185,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpDelete("DeleteTask")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Delete a Task entity and remove it from its coresponding skill")]
+        [SwaggerOperation("Delete a Task entity and remove it from its coresponding skill")]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string skillName)
         {
             try
@@ -233,7 +233,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpDelete("DeleteAllTasks")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Deletes all task entities from storage",
+        [SwaggerOperation("Deletes all task entities from storage",
         "Also removes Task entites from their coresponding skill")]
         public async Task<IActionResult> DeleteAllTasksAsync()
         {

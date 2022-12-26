@@ -11,7 +11,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User();
+        public static User user = new();
         private readonly IConfiguration _configuration;
 
         public AuthController(IConfiguration configuration)
@@ -60,10 +60,10 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         private string CreateToken(User user)
         {
-            List<Claim> claims = new List<Claim>
+            List<Claim> claims = new()
             {
-             new Claim(ClaimTypes.Name,user.Username),
-             new Claim(ClaimTypes.Role,"Pleb")
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, "Pleb")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));

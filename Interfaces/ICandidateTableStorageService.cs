@@ -1,6 +1,5 @@
 ﻿using Azure;
 using JWT_Login_Authorization_DotNet.Models;
-using Task = System.Threading.Tasks.Task;
 
 namespace JWT_Login_Authorization_DotNet.Interfaces
 {

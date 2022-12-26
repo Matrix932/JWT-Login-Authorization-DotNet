@@ -118,7 +118,7 @@ namespace JWT_Login_Authorization_DotNet.Services
 
         public async Task<Skill> UpdateSkillMapper(string id, SkillDTO skillDTO)
         {
-            Skill skill = new Skill();
+            Skill skill = new();
             skill.Id = id;
             skill.PartitionKey = id;
             skill.Name = skillDTO.Name;
