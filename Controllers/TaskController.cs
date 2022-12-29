@@ -74,7 +74,6 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetTasksBySkill")]
-        [AllowAnonymous]
         [SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
         public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
         {
