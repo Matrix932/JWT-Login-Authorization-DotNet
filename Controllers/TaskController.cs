@@ -23,7 +23,6 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetTask")]
-        [AllowAnonymous]
         [SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string skillName)
         {
@@ -61,7 +60,6 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpGet("GetTasks")]
-        [AllowAnonymous]
         [SwaggerOperation("Retrieve all Task entities from storage")]
         public async Task<IActionResult> GetTasksAsync()
         {
@@ -77,7 +75,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("GetTasksBySkill")]
         [AllowAnonymous]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
+        [SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
         public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
         {
             if (string.IsNullOrWhiteSpace(skillName))
@@ -94,7 +92,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPost("CreateTask"), AllowAnonymous]
+        [HttpPost("CreateTask")]
         [SwaggerOperation("Create a task entity",
             "You cannot create a task for a Skill that doesnt exist in the database, task will automatically be added to corresponding skill after creation")]
         public async Task<IActionResult> PostAsync([FromQuery] TaskDTO taskDTO)
@@ -125,7 +123,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateTask"), AllowAnonymous]
+        [HttpPut("UpdateTask")]
         [SwaggerOperation("Update a Task entity",
             "Input the ID of the Task that you want to update, all other inputs are new update values." +
             "You cannot update the Task's skill name to a skill that doesnt exist in the database")]

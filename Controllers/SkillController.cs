@@ -97,7 +97,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateSkill"), AllowAnonymous]
+        [HttpPut("UpdateSkill")]
         [SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill", "" +
             "Input the skillId of the skill you want to update, you can only update the skill name")]
         public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)

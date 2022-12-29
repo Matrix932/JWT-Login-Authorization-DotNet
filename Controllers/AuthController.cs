@@ -1,6 +1,7 @@
 ﻿using JWT_Login_Authorization_DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -20,7 +21,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("register")]
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Register a new user")]
+        [SwaggerOperation("Register a new user")]
         public async Task<ActionResult<User>> Register([FromQuery] UserDTO request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -32,7 +33,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         }
 
         [HttpPost("login")]//Login Logic and token creation
-        [Swashbuckle.AspNetCore.Annotations.SwaggerOperation("Login and get bearer token used in authorization")]
+        [SwaggerOperation("Login and get bearer token used in authorization")]
         public async Task<ActionResult<string>> Login([FromQuery] UserDTO request)
         {
             if (user.Username != request.Username)
@@ -45,7 +46,8 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
 
             string token = CreateToken(user);
-            return Ok(token);
+            return Ok("You have sucessfully generated a bearer token, input the token in following format to authorize methods \n" +
+                "bearer " + token);
         }
 
         //Password hashing
@@ -63,7 +65,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, "Pleb")
+                new Claim(ClaimTypes.Role, "Menager")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
