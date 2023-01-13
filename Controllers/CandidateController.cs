@@ -41,7 +41,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("candidates")]
         [SwaggerOperation("Retrieve all candidate entities")]
-        public async Task<IActionResult> GetAllCandidates()
+        public async Task<IActionResult> GetAsync()
         {
             return Ok(await _candidateService.GetAllCandidatesAsync());
         }
@@ -118,7 +118,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpDelete("candidates")]
         [SwaggerOperation("Deletes all candidate entities")]
-        public async Task<IActionResult> DeleteAllCandidatesAsync()
+        public async Task<IActionResult> DeleteAsync()
         {
             try
             {
