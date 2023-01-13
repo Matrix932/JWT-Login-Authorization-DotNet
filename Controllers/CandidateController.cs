@@ -19,7 +19,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _candidateService = candidateService;
         }
 
-        [HttpGet("GetCandidate")]
+        [HttpGet("{id}/{name}")]
         [SwaggerOperation("Retrieve a candidate entity using their id and name")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string name)
         {
@@ -39,14 +39,14 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("candidates")]
         [SwaggerOperation("Retrieve all candidate entities")]
         public async Task<IActionResult> GetAllCandidates()
         {
             return Ok(await _candidateService.GetAllCandidatesAsync());
         }
 
-        [HttpPost("CreateCandidate")]
+        [HttpPost("candidate")]
         [SwaggerOperation("Create a new candidate entity")]
         public async Task<IActionResult> PostAsync([FromQuery] CandidateDTO candidate)
         {
@@ -68,7 +68,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateCandidate")]
+        [HttpPut("candidate")]
         [SwaggerOperation("Update a candidate entity", "As the id and name are partion and row keys,they cannot be updated")]
         public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
         {
@@ -92,7 +92,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteCandidate")]
+        [HttpDelete("{id}/{name}")]
         [SwaggerOperation("Deletes a candidate entity")]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
         {
@@ -116,7 +116,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteAllCandidates")]
+        [HttpDelete("candidates")]
         [SwaggerOperation("Deletes all candidate entities")]
         public async Task<IActionResult> DeleteAllCandidatesAsync()
         {
