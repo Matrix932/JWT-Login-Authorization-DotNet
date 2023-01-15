@@ -21,7 +21,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpGet("{id}/{name}")]
         [SwaggerOperation("Retrieve a candidate entity using their id and name")]
-        public async Task<IActionResult> GetAsync([FromQuery] string id, string name)
+        public async Task<IActionResult> GetAsync(string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
             {
