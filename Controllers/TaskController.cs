@@ -22,9 +22,9 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _skillService = skillService;
         }
 
-        [HttpGet("{id}/{name}")]
+        [HttpGet("{id}/{skillName}")]
         [SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
-        public async Task<IActionResult> GetAsync([FromQuery] string id, string skillName)
+        public async Task<IActionResult> GetAsync(string id, string skillName)
         {
             if (string.IsNullOrWhiteSpace(skillName) || string.IsNullOrWhiteSpace(id))
             {
@@ -73,7 +73,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("{skillId}/tasks")]
+        [HttpGet("{skillName}/tasks")]
         [SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
         public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
         {
@@ -183,7 +183,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpDelete("{id}/{skillName}")]
         [SwaggerOperation("Delete a Task entity and remove it from its coresponding skill")]
-        public async Task<IActionResult> DeleteAsync([FromQuery] string id, string skillName)
+        public async Task<IActionResult> DeleteAsync(string id, string skillName)
         {
             try
             {

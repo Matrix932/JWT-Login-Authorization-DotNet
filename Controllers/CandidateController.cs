@@ -99,7 +99,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
 
         [HttpDelete("{id}/{name}")]
         [SwaggerOperation("Deletes a candidate entity")]
-        public async Task<IActionResult> DeleteAsync([FromQuery] string id, string name)
+        public async Task<IActionResult> DeleteAsync(string id, string name)
         {
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(id))
             {

@@ -22,7 +22,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _taskService = taskTableStorageService;
         }
 
-        [HttpGet("{id}/{name}")]
+        [HttpGet("{SkillId}/{SkillName}")]
         [SwaggerOperation("Retrieve a skill entity using its id and skillName")]
         public async Task<IActionResult> GetAsync(string SkillId, string SkillName)
         {
@@ -40,7 +40,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{SkillId}")]
         [SwaggerOperation("Retrieve a skill entity using its id")]
         public async Task<IActionResult> GetByIdAsync(string SkillId)
         {
@@ -155,7 +155,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("{id}/{name}")]
+        [HttpDelete("{SkillId}/{SkillName}")]
         [SwaggerOperation("Deletes a Skill Entity and all asociates tasks with the skill")]
         public async Task<IActionResult> DeleteAsync(string SkillId, string SkillName)
         {
