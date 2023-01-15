@@ -22,7 +22,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _skillService = skillService;
         }
 
-        [HttpGet("GetTask")]
+        [HttpGet("{id}/{name}")]
         [SwaggerOperation("Retrive task entity by id and name", "Retrive Task Entity")]
         public async Task<IActionResult> GetAsync([FromQuery] string id, string skillName)
         {
@@ -41,7 +41,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("GetTasklById")]
+        [HttpGet("{id}")]
         [SwaggerOperation("Retrieve a task entity using its id ")]
         public async Task<IActionResult> GetByIdAsync(string taskId)
         {
@@ -59,7 +59,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("GetTasks")]
+        [HttpGet("tasks")]
         [SwaggerOperation("Retrieve all Task entities from storage")]
         public async Task<IActionResult> GetTasksAsync()
         {
@@ -73,7 +73,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("GetTasksBySkill")]
+        [HttpGet("{skillId}/tasks")]
         [SwaggerOperation("Retrieve all Task entities from storage that have the inputed skill name")]
         public async Task<IActionResult> GetTasksBySkillAsync(string skillName)
         {
@@ -91,7 +91,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPost("CreateTask")]
+        [HttpPost("task")]
         [SwaggerOperation("Create a task entity",
             "You cannot create a task for a Skill that doesnt exist in the database, task will automatically be added to corresponding skill after creation")]
         public async Task<IActionResult> PostAsync([FromQuery] TaskDTO taskDTO)
@@ -122,7 +122,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateTask")]
+        [HttpPut("task")]
         [SwaggerOperation("Update a Task entity",
             "Input the ID of the Task that you want to update, all other inputs are new update values." +
             "You cannot update the Task's skill name to a skill that doesnt exist in the database")]
@@ -181,7 +181,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteTask")]
+        [HttpDelete("{id}/{skillName}")]
         [SwaggerOperation("Delete a Task entity and remove it from its coresponding skill")]
         public async Task<IActionResult> DeleteAsync([FromQuery] string id, string skillName)
         {
@@ -229,7 +229,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteAllTasks")]
+        [HttpDelete("tasks")]
         [SwaggerOperation("Deletes all task entities from storage",
         "Also removes Task entites from their coresponding skill")]
         public async Task<IActionResult> DeleteAllTasksAsync()

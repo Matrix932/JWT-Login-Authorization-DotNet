@@ -22,7 +22,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             _taskService = taskTableStorageService;
         }
 
-        [HttpGet("GetSkill")]
+        [HttpGet("{id}/{name}")]
         [SwaggerOperation("Retrieve a skill entity using its id and skillName")]
         public async Task<IActionResult> GetAsync(string SkillId, string SkillName)
         {
@@ -40,7 +40,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("GetSkillById")]
+        [HttpGet("{id}")]
         [SwaggerOperation("Retrieve a skill entity using its id")]
         public async Task<IActionResult> GetByIdAsync(string SkillId)
         {
@@ -58,7 +58,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("GetSkills")]
+        [HttpGet("skills")]
         [SwaggerOperation("Retrieve all skill Entities")]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -72,7 +72,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPost("CreateSkill")]
+        [HttpPost("skill")]
         [SwaggerOperation("Create a Skill entity")]
         public async Task<IActionResult> PostAsync([FromQuery] SkillDTO skillDTO)
         {
@@ -97,7 +97,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpPut("UpdateSkill")]
+        [HttpPut("skill")]
         [SwaggerOperation("Updates the skill name and the row key of all tasks belonging to the skill", "" +
             "Input the skillId of the skill you want to update, you can only update the skill name")]
         public async Task<IActionResult> UpdateAsync(string skillId, [FromQuery] SkillDTO skillDTO)
@@ -155,7 +155,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteSkill")]
+        [HttpDelete("{id}/{name}")]
         [SwaggerOperation("Deletes a Skill Entity and all asociates tasks with the skill")]
         public async Task<IActionResult> DeleteAsync(string SkillId, string SkillName)
         {
@@ -182,7 +182,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpDelete("DeleteAllSkills")]
+        [HttpDelete("skills")]
         [SwaggerOperation("Deletes all skills and all task entities from storage",
         "To keep the integrity of storage all task entites must be Deleted ")]
         public async Task<IActionResult> DeleteSkillsAsync()

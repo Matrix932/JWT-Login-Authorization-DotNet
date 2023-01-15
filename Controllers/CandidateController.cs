@@ -72,6 +72,11 @@ namespace JWT_Login_Authorization_DotNet.Controllers
         [SwaggerOperation("Update a candidate entity", "As the id and name are partion and row keys,they cannot be updated")]
         public async Task<IActionResult> UpdateAsync([FromQuery] CandidateDTO candidateDTO)
         {
+            if (await _candidateService.CheckIfCandidateExistsAsync(candidateDTO.Name, candidateDTO.Id) == false)
+            {
+                return StatusCode(400, "Cannot update Candidate : " + candidateDTO.Name + " Id : " + candidateDTO.Id + " as  no matching candidate was found in the database , please create the following candidate" +
+                    "before performing and update");
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest("Ivalid Model State");

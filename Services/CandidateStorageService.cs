@@ -100,5 +100,12 @@ namespace JWT_Login_Authorization_DotNet.Services
                 await tableClient.DeleteEntityAsync(candidate.Id, candidate.Name);
             }
         }
+
+        public async Task<bool> CheckIfCandidateExistsAsync(string candidateName, string id)
+        {
+            var tableClient = await GetTableClient();
+            int count = await tableClient.QueryAsync<Candidate>(x => x.PartitionKey.Equals(id) && x.RowKey.Equals(candidateName)).CountAsync();
+            return count > 0 ? true : false;
+        }
     }
 }
