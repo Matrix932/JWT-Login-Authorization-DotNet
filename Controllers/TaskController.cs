@@ -41,7 +41,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{taskId}")]
         [SwaggerOperation("Retrieve a task entity using its id ")]
         public async Task<IActionResult> GetByIdAsync(string taskId)
         {

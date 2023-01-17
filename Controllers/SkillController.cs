@@ -54,7 +54,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
             catch (RequestFailedException ex)
             {
-                return StatusCode(ex.Status, ex.Message);
+                return StatusCode(404, "A skill with the inputed ID does not exist in the database");
             }
         }
 
@@ -108,7 +108,7 @@ namespace JWT_Login_Authorization_DotNet.Controllers
             }
             if (await _skillService.CheckIfSkillExistsAsync(skillDTO.Name) != false)
             {
-                return StatusCode(403, "Cannot update skill name to : " + skillDTO.Name + "as a skill with name already exists");
+                return StatusCode(403, "Cannot update skill name to : " + skillDTO.Name + "  as a skill with name already exists");
             }
 
             try
